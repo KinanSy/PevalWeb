@@ -20,7 +20,8 @@ const Student = sequelize.define('Student', {
     allowNull: true,
   }
 }, {
-  tableName: 'Students',
+  modelName: 'Student',
+  tableName: 'Student',
   timestamps: false,
 });
 
