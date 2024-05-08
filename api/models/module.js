@@ -1,32 +1,28 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
 
-const Student = sequelize.define('Student', {
-  id_student: {
+const Module = sequelize.define('Module', {
+  id_module: {
     type: DataTypes.INTEGER,
     primaryKey: true,
     autoIncrement: true,
   },
-  stuFirstname: {
+  modTitle: {
     type: DataTypes.STRING(50),
     allowNull: false,
   },
-  stuLastname: {
-    type: DataTypes.STRING(50),
+  modNumber: {
+    type: DataTypes.TINYINT,
     allowNull: false,
-  },
-  stuToken: {
-    type: DataTypes.STRING(100),
-    allowNull: true,
   }
 }, {
-  modelName: 'Student',
-  tableName: 'Student',
+  modelName: 'Module',
+  tableName: '_Module',
   timestamps: false,
 });
 
 async function syncModel() {
-  await Student.sync();
+  await Module.sync();
 }
 
 syncModel();

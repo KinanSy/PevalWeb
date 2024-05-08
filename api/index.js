@@ -3,6 +3,9 @@ const app = express();
 const database = require('./config/database');
 
 const teacherRoutes = require('./routes/teacherRoutes');
+const studentRoutes = require('./routes/studentRoutes');
+const evaluationRoutes = require('./routes/evaluationRoutes');
+const moduleRoutes = require('./routes/moduleRoutes');
 
 // Database connection
 database.authenticate()
@@ -13,7 +16,10 @@ database.authenticate()
 app.use(express.json());
 
 // Routes
-app.use('/teacher', teacherRoutes);
+app.use('/Teacher', teacherRoutes);
+app.use('/Student', studentRoutes);
+app.use('/Evaluation', evaluationRoutes);
+app.use('/Module', moduleRoutes);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
