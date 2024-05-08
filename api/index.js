@@ -6,6 +6,8 @@ const teacherRoutes = require('./routes/teacherRoutes');
 const studentRoutes = require('./routes/studentRoutes');
 const evaluationRoutes = require('./routes/evaluationRoutes');
 const moduleRoutes = require('./routes/moduleRoutes');
+const objectiveRoutes = require('./routes/objectiveRoutes');
+const criterionRoutes = require('./routes/criterionRoutes');
 
 // Database connection
 database.authenticate()
@@ -20,6 +22,8 @@ app.use('/Teacher', teacherRoutes);
 app.use('/Student', studentRoutes);
 app.use('/Evaluation', evaluationRoutes);
 app.use('/Module', moduleRoutes);
+app.use('/Objective', objectiveRoutes);
+app.use('/Criterion', criterionRoutes);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
