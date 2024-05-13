@@ -20,7 +20,7 @@ const Module = sequelize.define('Module', {
   tableName: '_Module',
   timestamps: false,
 });
-
+module.exports = Module;
 async function syncModel() {
   await Module.sync();
 }

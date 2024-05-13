@@ -1,5 +1,5 @@
-const Module = require('../models/module');
-
+const db = require('../models');
+const Module = db.Module;
 // Get all modules
 exports.getAllModules = async (req, res) => {
   try {

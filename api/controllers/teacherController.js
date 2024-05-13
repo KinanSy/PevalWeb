@@ -1,5 +1,5 @@
-const Teacher = require('../models/teacher'); 
-
+const db = require('../models');
+const Teacher = db.Teacher;
 // Get all teachers
 exports.getAllTeachers = async (req, res) => {
   try {

@@ -25,6 +25,8 @@ const Student = sequelize.define('Student', {
   timestamps: false,
 });
 
+module.exports = Student;
+
 async function syncModel() {
   await Student.sync();
 }

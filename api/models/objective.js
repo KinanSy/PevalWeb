@@ -19,7 +19,7 @@ const Objective = sequelize.define('Objective', {
     type: DataTypes.STRING(512),
     allowNull: true
   },
-  id_evaluation: {
+  objEvaluationId: {
     type: DataTypes.INTEGER,
     allowNull: false,
     references: {
@@ -31,6 +31,8 @@ const Objective = sequelize.define('Objective', {
   tableName: 'Objective',
   timestamps: false 
 });
+
+module.exports = Objective;
 
 async function syncModel() {
     await Objective.sync();

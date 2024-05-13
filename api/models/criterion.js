@@ -2,7 +2,7 @@ const { DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
 
 const Criterion = sequelize.define('Criterion', {
-  id_criteria: {
+  id_criterion: {
     type: DataTypes.INTEGER,
     primaryKey: true,
     autoIncrement: true
@@ -39,7 +39,7 @@ const Criterion = sequelize.define('Criterion', {
     type: DataTypes.STRING(1000),
     allowNull: true
   },
-  id_objective: {
+  criObjectiveId: {
     type: DataTypes.INTEGER,
     allowNull: false,
     references: {
@@ -52,10 +52,11 @@ const Criterion = sequelize.define('Criterion', {
   timestamps: false 
 });
 
+module.exports = Criterion;
+
 async function syncModel() {
     await Criterion.sync();
 }
 
 syncModel();
 
-module.exports = Criterion;

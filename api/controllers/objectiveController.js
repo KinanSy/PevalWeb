@@ -1,5 +1,5 @@
-const Objective = require('../models/objective');
-
+const db = require('../models');
+const Objective = db.Objective;
 // Get all objectives
 exports.getAllObjectives = async (req, res) => {
   try {

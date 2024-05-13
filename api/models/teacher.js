@@ -29,7 +29,7 @@ const Teacher = sequalize.define('Teacher', {
     tableName: 'Teacher',
     timestamps: false
 });
-
+module.exports = Teacher;
 async function syncModel() {
     await Teacher.sync();
   }

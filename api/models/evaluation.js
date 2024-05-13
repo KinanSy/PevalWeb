@@ -43,14 +43,14 @@ const Evaluation = sequelize.define('Evaluation', {
     type: DataTypes.STRING(50),
     allowNull: true,
   },
-  teacherId: {
+  evaTeacherId: {
     type: DataTypes.INTEGER,
     references: {
       model: 'teacher',
       key: 'id_teacher'
     }
   },
-  moduleId: {
+  evaModuleId: {
     type: DataTypes.INTEGER,
     references: {
       model: '_module',
@@ -64,11 +64,12 @@ const Evaluation = sequelize.define('Evaluation', {
 });
 
 // Associations
-Evaluation.associate = (models) => {
-  Evaluation.belongsTo(models._Module,{as: 'Evaluation', foreignKey: 'id_module'})
-  Evaluation.belongsTo(models.Teacher,{as: 'Evaluation', foreignKey: 'id_teacher'})
+// Evaluation.associate = (models) => {
+//   Evaluation.belongsTo(models._Module,{as: 'Evaluation', foreignKey: 'id_module'})
+//   Evaluation.belongsTo(models.Teacher,{as: 'Evaluation', foreignKey: 'id_teacher'})
   
-}
+// }
+module.exports = Evaluation;
 
 async function syncModel() {
   await Evaluation.sync();

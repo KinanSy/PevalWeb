@@ -1,4 +1,5 @@
-const Student = require('../models/student');
+const db = require('../models');
+const Student = db.Student;
 
 // Get all students
 exports.getAllStudents = async (req, res) => {
@@ -12,17 +13,18 @@ exports.getAllStudents = async (req, res) => {
 
 // Create a new student
 exports.createStudent = async (req, res) => {
+  console.log("Crate")
   const { stuFirstname, stuLastname, stuToken } = req.body;
-  try {
+  // try {
     const newStudent = await Student.create({
       stuFirstname,
       stuLastname,
       stuToken,
     });
     res.status(201).json(newStudent);
-  } catch (error) {
-    res.status(500).json({ error: 'Internal Server Error' });
-  }
+  // } catch (error) {
+  //   res.status(500).json({ error: 'Internal Server Error' });
+  // }
 };
 
 // Get a student by ID

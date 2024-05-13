@@ -1,5 +1,5 @@
-const Evaluation = require('../models/evaluation');
-
+const db = require('../models');
+const Evaluation = db.Evaluation;
 // Get all evaluations
 exports.getAllEvaluations = async (req, res) => {
   try {

@@ -8,6 +8,7 @@ const evaluationRoutes = require('./routes/evaluationRoutes');
 const moduleRoutes = require('./routes/moduleRoutes');
 const objectiveRoutes = require('./routes/objectiveRoutes');
 const criterionRoutes = require('./routes/criterionRoutes');
+const criterionStudentResultRoutes = require('./routes/criterionStudentResultRoutes');
 
 // Database connection
 database.authenticate()
@@ -18,12 +19,13 @@ database.authenticate()
 app.use(express.json());
 
 // Routes
-app.use('/Teacher', teacherRoutes);
-app.use('/Student', studentRoutes);
-app.use('/Evaluation', evaluationRoutes);
-app.use('/Module', moduleRoutes);
-app.use('/Objective', objectiveRoutes);
-app.use('/Criterion', criterionRoutes);
+app.use('/teachers', teacherRoutes);
+app.use('/students', studentRoutes);
+app.use('/modules', moduleRoutes);
+app.use('/evaluations', evaluationRoutes);
+app.use('/objectives', objectiveRoutes);
+app.use('/criterions', criterionRoutes);
+app.use('/results', criterionStudentResultRoutes);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

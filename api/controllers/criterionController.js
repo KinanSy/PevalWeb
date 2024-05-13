@@ -1,4 +1,5 @@
-const Criterion = require('../models/criterion'); 
+const db = require('../models');
+const Criterion = db.Criterion;
 // Get all criteria
 exports.getAllCriteria = async (req, res) => {
   try {
