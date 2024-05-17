@@ -1,0 +1,30 @@
+.homeContainer{
+    display: flex;
+    height: 85%;
+    width:100%;
+    flex-direction: column;
+}
+.homeToolbar{
+    display:flex;
+    flex:1;
+    flex-direction: column;
+    padding:0.2rem;
+}
+.homeContentContainer{
+    flex:5;
+    padding:0.2rem;
+}
+
+.toolbarItemsContainer{
+    margin-top:auto;
+}
+.homeContent{
+    height:100%;
+    width:100%;
+}
+.createEvaluationButton{
+    width:48px;
+}
+.icon {
+    font-size: 32px;
+}

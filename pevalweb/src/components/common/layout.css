@@ -1,0 +1,37 @@
+* {
+    margin:0;
+    padding:0;
+}
+#root,html,body{
+    height:100%;
+    width:100%;
+}
+body{
+    background-color: #E9ECEF;
+}
+
+.footer{
+    text-align:center;
+}
+.header{
+    display:flex;
+    flex:1;
+    height:15vh;
+    justify-content: center;
+    margin-bottom:1rem;
+}
+.headerContainer{
+    width:85%;
+    margin-top:auto;
+}
+.content{
+    display:flex;
+    align-items: center;
+    justify-content: center;
+}
+#contentContainer{
+    display:flex;
+    justify-content: center;
+    align-content: center;
+    width:85%;
+}
