@@ -1,0 +1,20 @@
+.moduleDescriptionsTitle{
+    font-size: 1.5em;
+    font-weight: bold;
+}
+.moduleDescriptionsTitleValue{
+    font-size: 1.5em;
+}
+.toolbarItemsContainer{
+    display:flex;
+    justify-content: right;
+}
+.toolbarItemsContainer>div{
+    margin-left:0.5em;
+}
+.date{
+    text-align:right;
+}
+.homeContent{
+    padding:3em;
+}

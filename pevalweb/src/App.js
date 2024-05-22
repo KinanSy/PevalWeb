@@ -4,6 +4,8 @@ import Layouta from "./components/common/Layout";
 import Home from "./components/home/Home";
 import Login from "./components/login/Login";
 import CreateEvaluation from "./components/createEvaluation/CreateEvaluation";
+import Evaluation from "./components/evaluation/Evaluation";
+import StudentEvaluation from "./components/studentEvaluation/StudentEvaluation";
 import { ConfigProvider } from "antd";
 const router = createBrowserRouter([
   {
@@ -13,6 +15,14 @@ const router = createBrowserRouter([
       {
         path: "/",
         element: <Home />
+      },
+      {
+        path:"/Evaluation/:id",
+        element: <Evaluation />
+      },
+      {
+        path:"/Evaluation/:id/EvaluateStudent/:studentId",
+        element: <StudentEvaluation />
       },
       {
         path: "/Create",
