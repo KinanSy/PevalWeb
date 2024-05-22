@@ -17,3 +17,9 @@
 .objectivesCardsContainer>div{
     margin-top:1rem;
 }
+.criteriasCardsContainer{
+    margin-top:1rem;
+}
+.criteriasCardsContainer>div{
+    margin-top:0.5rem;
+}

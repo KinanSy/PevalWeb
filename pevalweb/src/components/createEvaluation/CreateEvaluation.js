@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Steps, Form, Button, Card, Input, Select} from 'antd';
+import { Steps, Form, Button, Card, Input, Select,Row,Col} from 'antd';
 import { DeleteOutlined } from '@ant-design/icons';
 import ObjectiveForm from './ObjectiveForm';
 import CriteriaForm from './CriteriaForm'; 
@@ -8,21 +8,26 @@ import "./createEvaluation.css";
 const { Step } = Steps;
 const { TextArea } = Input;
 const CreateEvaluation = () => {
-  const [current, setCurrent] = useState(0);
-  const [form] = Form.useForm();
+    const [current, setCurrent] = useState(0);
+    const [form] = Form.useForm();
+    const [objectives,setObjectives] = useState([]);
+    const [criterias,setCriterias] = useState([]);
 
-  const next = () => {
-    setCurrent(current + 1);
-  };
+    const next = () => {
+        setCurrent(current + 1);
+        console.log(objectives)
+        console.log(criterias)
 
-  const prev = () => {
-    setCurrent(current - 1);
-  };
+    };
 
-  const onFinish = (values) => {
-  };
+    const prev = () => {
+        setCurrent(current - 1);
+    };
 
-  return (
+    const onFinish = (values) => {
+    };
+
+    return (
     <Card title="Créer une évaluation" className='createEvaluationFormContainer'>
         <Form form={form} layout="vertical" onFinish={onFinish}>
             <Steps current={current}>
@@ -51,24 +56,11 @@ const CreateEvaluation = () => {
                     )}
                     {current === 1 && (
                         
-                        <div className='objectivesFormContainer'>
-                            <div className='objectivesCardsContainer'>
-                                    <Card
-                                    title="Objectif #1"
-                                    extra={<Button type="link" icon={<DeleteOutlined />} />}
-                                    >
-                                    <Form.Item  name="evaLocation" rules={[{ required: true}]}>
-                                        <Input placeholder="Salle de l'évaluation" />
-                                    </Form.Item>
-                                    </Card>
-                            </div>
-                            <div className='objectivesButtonsContainer'>
-                                <Button type="dashed">Ajouter un objectif</Button>
-                            </div>
-                        </div>
-                        
+                        <ObjectiveForm objectives={objectives} setObjectives={setObjectives}></ObjectiveForm>
                     )}
-                    {current === 2 && <div>step 3</div>}
+                    {current === 2 && (
+                        <CriteriaForm objectives={objectives} criterias={criterias} setCriterias={setCriterias}></CriteriaForm>
+                    )}
                 </div>
             </div>
 
@@ -91,7 +83,7 @@ const CreateEvaluation = () => {
             </div>
         </Form>
     </Card>
-  );
+    );
 };
 
 export default CreateEvaluation;
