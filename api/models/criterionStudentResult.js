@@ -39,6 +39,20 @@ const CriterionStudentResult = sequelize.define('CriterionStudentResult', {
   timestamps: false
 });
 
+CriterionStudentResult.associate = models => {
+  CriterionStudentResult.belongsTo(models.Criterion, {
+    as: 'criterion',
+    foreignKey: 'csrCriterionId'
+  });
+  CriterionStudentResult.belongsTo(models.Teacher, {
+    as: 'teacher',
+    foreignKey: 'csrTeacherId'
+  });
+  CriterionStudentResult.belongsTo(models.Student, {
+    as: 'student',
+    foreignKey: 'csrStudentId'
+  });
+};
 module.exports = CriterionStudentResult;
 
 async function syncModel() {

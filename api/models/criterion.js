@@ -52,6 +52,14 @@ const Criterion = sequelize.define('Criterion', {
   timestamps: false 
 });
 
+Criterion.associate = models => {
+  Criterion.hasMany(models.CriterionStudentResult, {
+      as: 'criterionResults',
+      sourceKey: 'id_criterion',
+      foreignKey: 'csrCriterionId'
+  });
+};
+
 module.exports = Criterion;
 
 async function syncModel() {

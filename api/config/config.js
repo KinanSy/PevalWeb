@@ -28,7 +28,7 @@ const port = process.env.PORT
 var config = {
     "development": {
       "username": "root",
-      "password": "root",
+      "password": "",
       "database": "pevalweb",
       "host": "127.0.0.1",
       "dialect": "mysql"
