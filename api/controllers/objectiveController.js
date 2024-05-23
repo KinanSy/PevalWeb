@@ -12,17 +12,17 @@ exports.getAllObjectives = async (req, res) => {
 
 // Create a new objective
 exports.createObjective = async (req, res) => {
-  const { objTitle, objWeight, objComment, id_evaluation } = req.body;
+  const { objTitle, objWeight, objComment, objEvaluationId } = req.body;
   try {
     const newObjective = await Objective.create({
       objTitle,
       objWeight,
       objComment,
-      id_evaluation
+      objEvaluationId
     });
     res.status(201).json(newObjective);
   } catch (error) {
-    res.status(500).json({ error: 'Internal Server Error' });
+    res.status(500).json({ error: error });
   }
 };
 
