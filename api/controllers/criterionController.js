@@ -12,7 +12,7 @@ exports.getAllCriteria = async (req, res) => {
 
 // Create a new criterion
 exports.createCriterion = async (req, res) => {
-  const { criTitle, criConditionsDescription, criExpectationDescription, criWeight, criLevel0Description, criLevel1Description, criLevel2Description, criLevel3Description, id_objective } = req.body;
+  const { criTitle, criConditionsDescription, criExpectationDescription, criWeight, criLevel0Description, criLevel1Description, criLevel2Description, criLevel3Description, criObjectiveId } = req.body;
   try {
     const newCriterion = await Criterion.create({
       criTitle,
@@ -23,11 +23,11 @@ exports.createCriterion = async (req, res) => {
       criLevel1Description,
       criLevel2Description,
       criLevel3Description,
-      id_objective
+      criObjectiveId
     });
     res.status(201).json(newCriterion);
   } catch (error) {
-    res.status(500).json({ error: 'Internal Server Error' });
+    res.status(500).json(error.message);
   }
 };
 
@@ -49,7 +49,7 @@ exports.getCriterionById = async (req, res) => {
 // Update a criterion by ID
 exports.updateCriterion = async (req, res) => {
   const id = req.params.id;
-  const { criTitle, criConditionsDescription, criExpectationDescription, criWeight, criLevel0Description, criLevel1Description, criLevel2Description, criLevel3Description, id_objective } = req.body;
+  const { criTitle, criConditionsDescription, criExpectationDescription, criWeight, criLevel0Description, criLevel1Description, criLevel2Description, criLevel3Description, criObjectiveId } = req.body;
   try {
     const criterion = await Criterion.findByPk(id);
     if (criterion) {
@@ -61,7 +61,7 @@ exports.updateCriterion = async (req, res) => {
       criterion.criLevel1Description = criLevel1Description;
       criterion.criLevel2Description = criLevel2Description;
       criterion.criLevel3Description = criLevel3Description;
-      criterion.id_objective = id_objective;
+      criterion.criObjectiveId = criObjectiveId;
       await criterion.save();
       res.json(criterion);
     } else {

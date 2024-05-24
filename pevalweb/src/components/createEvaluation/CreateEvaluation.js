@@ -60,6 +60,9 @@ const CreateEvaluation = () => {
             console.log(error)
         })
         const createdEvaluationId = response.data.id_evaluation
+        
+        const objectivesIds = [];
+        const addedObjectiveIds = [];
 
         // Create objectives
         await Promise.all(
@@ -73,14 +76,41 @@ const CreateEvaluation = () => {
                     objComment:objective.comment,
                     objEvaluationId:createdEvaluationId
                 })
-                .then(data => {
-                    console.log(response.data)
-                })
                 .catch(error => {
                     console.log(error)
                 })
+                return response;
             })    
-        )            
+        ).then(async data => {
+
+            const addedObjectivesArray = data;
+            addedObjectivesArray.map((objective,index) => {
+                addedObjectiveIds.push({"addedObjective":objective.data.id_objective,"objectiveFormKey": objectives[index].id})
+            })
+            await Promise.all(
+                criterias.map(async (criteria) => {
+                    const criteriaIdInDB = addedObjectiveIds.find((e) => e["objectiveFormKey"] === criteria.objectiveId)["addedObjective"]
+                    const response = 
+                    await axios.post(process.env.REACT_APP_API_HOST + "/criterions", {
+                        criTitle : criteria.title,
+                        criConditionsDescription : criteria.conditionsDescription,
+                        criExpectationDescription : criteria.expectationDescription,
+                        criWeight : criteria.weight,
+                        criLevel0Description : criteria.level0Description,
+                        criLevel1Description : criteria.level1Description,
+                        criLevel2Description : criteria.level2Description,
+                        criLevel3Description : criteria.level3Description,
+                        criObjectiveId : criteriaIdInDB
+                    })
+                    .then(data => {
+                        console.log(data.data)
+                    })
+                    .catch(error => {
+                        console.log(error)
+                    })
+                })
+            )
+        })         
     };
     
 

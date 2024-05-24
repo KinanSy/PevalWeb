@@ -32,6 +32,14 @@ const Objective = sequelize.define('Objective', {
   timestamps: false 
 });
 
+Objective.associate = models => {
+  Objective.hasMany(models.Criterion, {
+    as: 'criterions',
+    foreignKey: 'criObjectiveId'
+  });
+};
+
+
 module.exports = Objective;
 
 async function syncModel() {

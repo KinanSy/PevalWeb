@@ -1,7 +1,8 @@
-import React from 'react';
+import React , {useEffect, useState} from 'react';
 import { Table, Button, Card, Row, Col, Divider } from 'antd';
 import { EyeOutlined, EditOutlined, DeleteOutlined,SendOutlined} from '@ant-design/icons';
 import { useParams } from 'react-router-dom';
+import axios from 'axios';
 import "./evaluation.css"
 
 
@@ -82,12 +83,10 @@ const columns = [
   {
     title: 'Nom de l\'élève',
     dataIndex: 'name',
-    key: 'name',
   },
   {
     title: 'Note',
     dataIndex: 'note',
-    key: 'note',
     align:"center",
     width:"20%",
     render: (text) => <b>{text}</b>
@@ -109,6 +108,78 @@ const columns = [
 
 function Evaluation (){
     const { id } = useParams();
+    const [evalData,setEvalData] = useState({
+        id_evaluation: 0,
+        evaTitle: "",
+        evaDescription: "",
+        evaWeight: "",
+        evaDate: "",
+        evaLocation: "",
+        evaTeacherId: "",
+        evaModuleId: "",
+        module:{
+            modNumber : 0,
+            modTitle : ""
+        }
+      });
+    const [studentIds,setStudentIds] = useState([])
+    const [students, setStudents] = useState([]);
+    const [studentsTable, setStudentsTable] = useState([]);
+
+    useEffect(() => {
+        axios.get(process.env.REACT_APP_API_HOST + "/evaluations/" + id)
+        .then(res => {
+            setEvalData(res.data);
+
+            var newStudentIds = [];
+            if (Array.isArray(res.data.objectives)) {
+                res.data.objectives.forEach(objective => {
+                    if (Array.isArray(objective.criterions)) {
+                        objective.criterions.forEach(criterion => {
+                            if (Array.isArray(criterion.criterionResults)) {
+                                criterion.criterionResults.forEach(result => {
+                                    if (!studentIds.includes(result.csrStudentId) && !newStudentIds.includes(result.csrStudentId)) {
+                                        newStudentIds.push(result.csrStudentId);
+                                    }
+                                });
+                            }
+                        });
+                    }
+                });
+            }
+            setStudentIds([...studentIds, ...newStudentIds]);
+            
+        })
+        
+    }, [id]);
+
+    useEffect(() => {
+        if (studentIds.length > 0) {
+            const fetchStudents = async () => {
+                const studentRequests = studentIds.map(id => 
+                    axios.get(`${process.env.REACT_APP_API_HOST}/students/${id}`)
+                );
+                try {
+                    const responses = await Promise.all(studentRequests);
+                    const fetchedStudents = responses.map(response => response.data);
+                    setStudents(fetchedStudents);
+    
+                    const newDataSource = fetchedStudents.map(student => ({
+                        key: student.id_student.toString(),
+                        name: `${student.stuFirstname} ${student.stuLastname}`,
+                        note: '1',
+                    }));
+                    setStudentsTable(newDataSource);
+                } catch (error) {
+                    console.error('Error fetching student details:', error);
+                }
+            };
+            fetchStudents();
+        }
+    }, [studentIds]); 
+    
+
+    console.log(students);
     return (
         <div className="homeContainer">
         <div className="homeToolbar">
@@ -125,7 +196,7 @@ function Evaluation (){
             <Card className="homeContent">
                 <Row>
                     <Col span={18} push={6} className='moduleDescriptionsTitleValue'>
-                        Module title value
+                        {evalData["module"]["modNumber"]} - {evalData["module"]["modTitle"]}
                     </Col>
                     <Col span={6} pull={18} className='moduleDescriptionsTitle'>
                         Module
@@ -133,7 +204,7 @@ function Evaluation (){
                 </Row>
                 <Row>
                     <Col span={18} push={6} className='moduleDescriptionsTitleValue'>
-                        Titre value
+                        {evalData["evaTitle"]}
                     </Col>
                     <Col span={6} pull={18} className='moduleDescriptionsTitle'>
                         Titre
@@ -141,7 +212,7 @@ function Evaluation (){
                 </Row>
                 <Row>
                     <Col span={18} push={6} className='moduleDescriptionsTitleValue'>
-                        Description value
+                        {evalData["evaDescription"]}
                     </Col>
                     <Col span={6} pull={18} className='moduleDescriptionsTitle'>
                         Description
@@ -149,7 +220,7 @@ function Evaluation (){
                 </Row>
                 <Row>
                     <Col span={18} push={6} className='moduleDescriptionsTitleValue'>
-                        Salle value
+                        {evalData["evaLocation"]}
                     </Col>
                     <Col span={6} pull={18} className='moduleDescriptionsTitle'>
                         Salle
@@ -170,7 +241,7 @@ function Evaluation (){
                     </Col>
                 </Row>
                 <Divider></Divider>
-                <Table dataSource={dataSource} columns={columns} pagination={false} />
+                <Table dataSource={studentsTable} columns={columns} pagination={false} />
             </Card>
         </div>
     </div>

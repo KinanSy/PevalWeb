@@ -58,6 +58,10 @@ Criterion.associate = models => {
       sourceKey: 'id_criterion',
       foreignKey: 'csrCriterionId'
   });
+  Criterion.belongsTo(models.Objective, {
+    as: 'objective',
+    foreignKey: 'criObjectiveId'
+  });
 };
 
 module.exports = Criterion;

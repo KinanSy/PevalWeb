@@ -1,5 +1,9 @@
 const db = require('../models');
 const Evaluation = db.Evaluation;
+const Module = db.Module;
+const Objective = db.Objective;
+const Criterion = db.Criterion;
+const CriterionStudentResult = db.CriterionStudentResult;
 // Get all evaluations
 exports.getAllEvaluations = async (req, res) => {
   try {
@@ -31,14 +35,20 @@ exports.createEvaluation = async (req, res) => {
 exports.getEvaluationById = async (req, res) => {
   const id = req.params.id;
   try {
-    const evaluation = await Evaluation.findByPk(id);
+    const evaluation = await Evaluation.findByPk(id,{
+      include: [{ model: Module, as: 'module' },{model: Objective,as:"objectives", include:
+        [{model: Criterion,as:"criterions", include:
+          [{model: CriterionStudentResult, as:"criterionResults"}]
+        }]
+      }] // continue
+    });
     if (evaluation) {
       res.json(evaluation);
     } else {
       res.status(404).json({ error: 'Evaluation not found' });
     }
   } catch (error) {
-    res.status(500).json({ error: 'Internal Server Error' });
+    res.status(500).json(error.message);
   }
 };
 

@@ -63,6 +63,16 @@ const Evaluation = sequelize.define('Evaluation', {
   timestamps: false,
 });
 
+Evaluation.associate = models => {
+  Evaluation.belongsTo(models.Module, {
+    as: 'module',
+    foreignKey: 'evaModuleId'
+  });
+  Evaluation.hasMany(models.Objective, {
+    as: 'objectives',
+    foreignKey: 'objEvaluationId'
+  });
+};
 // Associations
 // Evaluation.associate = (models) => {
 //   Evaluation.belongsTo(models._Module,{as: 'Evaluation', foreignKey: 'id_module'})
