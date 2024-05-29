@@ -35,3 +35,18 @@ body{
     align-content: center;
     width:85%;
 }
+.headerContentContainer{
+    display:flex;
+}
+.headerContentCol{
+    margin-top:auto;
+}
+.userInfo{
+    display:flex;
+    flex-direction: row;
+    justify-content: space-around;
+}
+.userButtons{
+    text-align:right;
+    padding-right:1rem;
+}

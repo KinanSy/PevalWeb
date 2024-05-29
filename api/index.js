@@ -10,6 +10,7 @@ const moduleRoutes = require('./routes/moduleRoutes');
 const objectiveRoutes = require('./routes/objectiveRoutes');
 const criterionRoutes = require('./routes/criterionRoutes');
 const criterionStudentResultRoutes = require('./routes/criterionStudentResultRoutes');
+const authRoutes = require('./routes/authRoutes');
 
 // Database connection
 database.authenticate()
@@ -30,6 +31,7 @@ app.use('/evaluations', evaluationRoutes);
 app.use('/objectives', objectiveRoutes);
 app.use('/criterions', criterionRoutes);
 app.use('/results', criterionStudentResultRoutes);
+app.use('/auth', authRoutes);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
