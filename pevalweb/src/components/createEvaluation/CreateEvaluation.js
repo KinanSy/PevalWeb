@@ -51,14 +51,18 @@ const CreateEvaluation = () => {
         })
     }, []);
 
+    const filterOption = (input, option) =>
+        (option?.label ?? '').toLowerCase().includes(input.toLowerCase());
+
     const onFinish = async (values) => {
         // Create evaluation
+        console.log(evaluation)
         const response = 
         await axios.post(process.env.REACT_APP_API_HOST + "/evaluations", {
             evaTitle: evaluation.evaTitle,
             evaDescription: evaluation.evaDescription,
             evaLocation: evaluation.evaLocation,
-            evaModuleId: evaluation.moduleid,
+            evaModuleId: evaluation.moduleId,
         })
         .catch(function (error){
             console.log(error)
@@ -134,7 +138,12 @@ const CreateEvaluation = () => {
                     {current === 0 && (
                         <div>
                             <Form.Item name="moduleid" rules={[{ required: true }]}>
-                                <Select placeholder="Module" options={modules} onChange={(value) => updateEvaluationData('moduleId', value)} 
+                                <Select 
+                                placeholder="Module" 
+                                options={modules} 
+                                onChange={(value) => updateEvaluationData('moduleId', value)} 
+                                showSearch
+                                filterOption={filterOption}
                                 />
                             </Form.Item>
                             <Form.Item name="evaLocation" rules={[{ required: true }]}>

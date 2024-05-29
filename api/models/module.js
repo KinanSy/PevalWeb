@@ -8,11 +8,11 @@ const Module = sequelize.define('Module', {
     autoIncrement: true,
   },
   modTitle: {
-    type: DataTypes.STRING(50),
+    type: DataTypes.STRING(255),
     allowNull: false,
   },
   modNumber: {
-    type: DataTypes.TINYINT,
+    type: DataTypes.SMALLINT.UNSIGNED,
     allowNull: false,
   }
 }, {

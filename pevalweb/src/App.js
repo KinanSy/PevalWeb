@@ -1,4 +1,4 @@
-import React, {useContext} from "react";
+import React, { useContext } from "react";
 import { createBrowserRouter, RouterProvider, Navigate } from "react-router-dom";
 import Layouta from "./components/common/Layout";
 import Home from "./components/home/Home";
@@ -8,11 +8,15 @@ import Evaluation from "./components/evaluation/Evaluation";
 import StudentEvaluation from "./components/studentEvaluation/StudentEvaluation";
 import StudentEvaluationResult from "./components/studentEvaluationResult/StudentEvaluationResult";
 import EditEvaluation from "./components/editEvaluation/EditEvaluation";
-import { ConfigProvider } from "antd";
+import { ConfigProvider, Spin } from "antd";
 import { AuthProvider, AuthContext } from "./AuthContext";
 
 const PrivateRoute = ({ children }) => {
-  const { auth } = useContext(AuthContext);
+  const { auth, loading } = useContext(AuthContext);
+
+  if (loading) {
+    return <Spin spinning fullscreen></Spin>;
+  }
 
   if (!auth.teacherId) {
     return <Navigate to="/Login" />;
@@ -21,15 +25,14 @@ const PrivateRoute = ({ children }) => {
   return children;
 };
 
-
 const router = createBrowserRouter([
   {
     path: "/",
-    element: 
+    element: (
       <PrivateRoute>
         <Layouta />
       </PrivateRoute>
-    ,
+    ),
     children: [
       {
         path: "/",
@@ -72,8 +75,8 @@ export default function App() {
             bodyBg: "#E9ECEF",
             footerBg: "#E9ECEF",
             headerBg: "#E9ECEF",
-            headerPadding:"0 0",
-            headerHeight:"2.3vh",
+            headerPadding: "0 0",
+            headerHeight: "2.3vh",
           },
         },
       }}
