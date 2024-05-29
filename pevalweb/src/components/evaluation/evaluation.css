@@ -18,3 +18,7 @@
 .homeContent{
     padding:3em;
 }
+.addStudentButtonContainer{
+    display:flex;
+    justify-content: center;
+}

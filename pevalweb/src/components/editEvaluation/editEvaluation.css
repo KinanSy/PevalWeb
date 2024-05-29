@@ -1,0 +1,25 @@
+.createEvaluationFormContainer{
+    width:100%;
+}
+
+.stepsContentContainer{
+    display: flex;
+    justify-content: center;
+}
+.stepsContent{
+    min-height: 20vh;
+    width:95%;
+    padding: 1rem;
+}
+.objectivesButtonsContainer{
+    margin-top:1rem;
+}
+.objectivesCardsContainer>div{
+    margin-top:1rem;
+}
+.criteriasCardsContainer{
+    margin-top:1rem;
+}
+.criteriasCardsContainer>div{
+    margin-top:0.5rem;
+}

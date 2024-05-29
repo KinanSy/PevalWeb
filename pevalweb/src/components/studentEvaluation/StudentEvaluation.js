@@ -1,68 +1,23 @@
-import React, { useState } from 'react';
-import { Form, Card, Row, Col, Divider, Input, Select, Collapse, Tooltip } from 'antd';
+import React, { useState, useEffect } from 'react';
+import { Form, Card, Row, Col, Divider, Input, Select, Collapse, Tooltip, message } from 'antd';
 import { SaveOutlined } from '@ant-design/icons';
 import { useParams } from 'react-router-dom';
+import axios from 'axios';
 import "./studentEvaluation.css";
 
 const { Option } = Select;
 const { Panel } = Collapse;
 const { TextArea } = Input;
 
-// Example data
-const sourceData = [
-    {
-        id: '1',
-        objTitle: "Objective 1",
-        criterias: [
-            {
-                id: '1',
-                criTitle: "criteria 1",
-                criConditionsDescription: "criConditionsDescription 1",
-                criExpectationDescription: "criExpectationDescription 1",
-                criWeight: "0.5",
-                criLevel0Description: "Level 0",
-                criLevel1Description: "Level 1",
-                criLevel2Description: "Level 2",
-                criLevel3Description: "Level 3",
-            },
-            {
-                id: '2',
-                criTitle: "criteria 2",
-                criConditionsDescription: "criConditionsDescription 2",
-                criExpectationDescription: "criExpectationDescription 2",
-                criWeight: "1",
-                criLevel0Description: "Level 0",
-                criLevel1Description: "Level 1",
-                criLevel2Description: "Level 2",
-                criLevel3Description: "Level 3",
-            },
-        ]
-    },
-    {
-        id: '2',
-        objTitle: "Objective 2",
-        criterias: [
-            {
-                id: '1',
-                criTitle: "criteria 1",
-                criConditionsDescription: "criConditionsDescription 1",
-                criExpectationDescription: "criExpectationDescription 1",
-                criWeight: "0.5",
-                criLevel0Description: "Level 0",
-                criLevel1Description: "Level 1",
-                criLevel2Description: "Level 2",
-                criLevel3Description: "Level 3",
-            },
-        ]
-    }
-];
+function renderCriteria(criteria, objectiveId, onScoreSelectChange, genericRemarks, studentId) {
+    const result = criteria.criterionResults.find(r => r.csrStudentId == studentId) || {};
+    const criteriaId = criteria.id_criterion;
 
-function renderCriteria(criteria, objectiveId, onScoreSelectChange, genericRemarks) {
-    const scoreKey = `${objectiveId}-${criteria.id}`;
+    const scoreKey = `${objectiveId}-${criteriaId}-${studentId}`;
     const genericRemark = genericRemarks[scoreKey] || '';
 
     return (
-        <div key={criteria.id} style={{ borderBottom: '1px solid #ddd', padding: '10px 0' }}>
+        <div key={criteriaId} style={{ borderBottom: '1px solid #ddd', padding: '10px 0' }}>
             <Row gutter={16} style={{ overflowWrap: 'break-word' }}>
                 <Col span={11}>
                     <div><strong>Critère</strong></div>
@@ -79,8 +34,8 @@ function renderCriteria(criteria, objectiveId, onScoreSelectChange, genericRemar
                             <div>{criteria.criWeight}</div>
                         </div>
                         <div style={{ flex: 1 }}>
-                            <Form.Item name={`score-${objectiveId}-${criteria.id}`}>
-                                <Select defaultValue="-1" style={{ width: '100%' }} onChange={(e) => { onScoreSelectChange(e, criteria, objectiveId) }}>
+                            <Form.Item name={`score-${objectiveId}-${criteriaId}-${studentId}`} initialValue={result.csrScore}>
+                                <Select key={`score-${scoreKey}`} style={{ width: '100%' }} onChange={(value) => { onScoreSelectChange(value, criteria, objectiveId, studentId) }}>
                                     <Option value="-1" disabled={true}>Points (0-3)</Option>
                                     <Option value="0">0</Option>
                                     <Option value="1">1</Option>
@@ -97,7 +52,7 @@ function renderCriteria(criteria, objectiveId, onScoreSelectChange, genericRemar
                     </div>
                 </Col>
                 <Col span={5}>
-                    <Form.Item name={`personalRemark-${objectiveId}-${criteria.id}`}>
+                    <Form.Item name={`personalRemark-${objectiveId}-${criteriaId}-${studentId}`} initialValue={result.csrComment}>
                         <TextArea placeholder="Remarque personnelle" rows={5} />
                     </Form.Item>
                 </Col>
@@ -108,24 +63,147 @@ function renderCriteria(criteria, objectiveId, onScoreSelectChange, genericRemar
 
 function StudentEvaluation() {
     const { evalId, studentId } = useParams();
+    const [objectivesData, setObjectivesData] = useState([]);
     const [form] = Form.useForm();
     const [genericRemarks, setGenericRemarks] = useState({});
+    const [note, setNote] = useState(1);
+    const [roundedNote, setRoundedNote] = useState(1);
+    const [studentData, setStudentData] = useState({});
+    const [evaluationData, setEvaluationData] = useState({});
 
+    useEffect(() => {
+        axios.get(`${process.env.REACT_APP_API_HOST}/evaluations/${evalId}`)
+        .then(res => {
+            console.log(res.data["objectives"]);
+            setObjectivesData(res.data["objectives"] || []);
+            calculateNoteFromData(res.data["objectives"]);
+            setEvaluationData(res.data);
+        }).catch(err => {
+            console.error('Error fetching evaluation data:', err);
+            setObjectivesData([]);
+        });
+    }, [evalId]);
+
+    useEffect(() => {
+        axios.get(`${process.env.REACT_APP_API_HOST}/students/${studentId}`)
+        .then(res => {
+            setStudentData(res.data);
+        }).catch(err => {
+            console.error('Error fetching student data:', err);
+        });
+    }, [studentId]);
+    
+    const calculateNote = (values) => {
+        let totalScore = 0;
+        let totalWeight = 0;
+    
+        objectivesData.forEach(objective => {
+            const objectiveWeight = parseFloat(objective.objWeight);
+            if (Array.isArray(objective.criterions)) {
+                objective.criterions.forEach(criteria => {
+                    const criteriaWeight = parseFloat(criteria.criWeight);
+                    const scoreKey = `score-${objective.id_objective}-${criteria.id_criterion}-${studentId}`;
+                    const score = values[scoreKey] || 0;
+                    totalScore += (score / 3) * criteriaWeight * objectiveWeight;
+                    totalWeight += criteriaWeight * objectiveWeight;
+                });
+            }
+        });
+    
+        const percentage = totalScore / totalWeight;
+        const calculatedNote = (percentage * 5) + 1;
+        const calculatedRoundedNote = Math.round(calculatedNote * 2) / 2;
+    
+        setNote(calculatedNote.toFixed(1));
+        setRoundedNote(calculatedRoundedNote.toFixed(1));
+    };
+    
+    const calculateNoteFromData = (data) => {
+        let totalScore = 0;
+        let totalWeight = 0;
+    
+        data.forEach(objective => {
+            const objectiveWeight = parseFloat(objective.objWeight);
+            if (Array.isArray(objective.criterions)) {
+                objective.criterions.forEach(criteria => {
+                    const criteriaWeight = parseFloat(criteria.criWeight);
+                    const result = criteria.criterionResults.find(r => r.csrStudentId == studentId) || {};
+                    const score = result.csrScore || 0;
+                    totalScore += (score / 3) * criteriaWeight * objectiveWeight;
+                    totalWeight += criteriaWeight * objectiveWeight;
+                });
+            }
+        });
+    
+        const percentage = totalScore / totalWeight;
+        const calculatedNote = (percentage * 5) + 1;
+        const calculatedRoundedNote = Math.round(calculatedNote * 2) / 2;
+    
+        setNote(calculatedNote.toFixed(1));
+        setRoundedNote(calculatedRoundedNote.toFixed(1));
+    };
+    const getNoteClassName = (note) => {
+        if (note >= 1 && note < 3.5) {
+            return 'noteMediocre';
+        } else if (note >= 3.5 && note < 5) {
+            return 'noteAverage';
+        } else if (note >= 5 && note <= 6) {
+            return 'noteGood';
+        }
+        return '';
+    };
+    
+    
     function onSaveClick() {
         form.submit();
     }
 
     function handleFinish(values) {
-        console.log(values);
+        console.log('Form values:', values);
+
+        calculateNote(values);
+
+        const updates = [];
+        for (const key in values) {
+            if (key.startsWith('score-')) {
+                const [_, objectiveId, criteriaId, studentId] = key.split('-');
+                const score = values[key];
+                const commentKey = `personalRemark-${objectiveId}-${criteriaId}-${studentId}`;
+                const comment = values[commentKey] || '';
+
+                const objective = objectivesData.find(obj => obj.id_objective.toString() === objectiveId);
+                const criterion = objective.criterions.find(cri => cri.id_criterion.toString() === criteriaId);
+                const result = criterion.criterionResults.find(res => res.csrStudentId.toString() === studentId);
+
+                updates.push({
+                    id_criterionStudentResult: result.id_criterionStudentResult,
+                    csrScore: score,
+                    csrComment: comment
+                });
+            }
+        }
+
+        Promise.all(updates.map(update =>
+            axios.put(`${process.env.REACT_APP_API_HOST}/results/${update.id_criterionStudentResult}`, update)
+        )).then(responses => {
+            message.success('Les données ont été mises à jour');
+        }).catch(error => {
+            message.error('Les données n\'ont pas été mises à jour');
+        });
     }
 
-    function onScoreSelectChange(value, criteria, objectiveId) {
-        const scoreKey = `${objectiveId}-${criteria.id}`;
+    function onScoreSelectChange(value, criteria, objectiveId, studentId) {
+        const scoreKey = `${objectiveId}-${criteria.id_criterion}-${studentId}`;
         const remark = criteria[`criLevel${value}Description`];
+    
         setGenericRemarks(prevRemarks => ({
             ...prevRemarks,
             [scoreKey]: remark
         }));
+
+        form.validateFields().then(values => {
+            calculateNote(values);
+        });
     }
 
     return (
@@ -143,7 +221,7 @@ function StudentEvaluation() {
                 <Card className="homeContent">
                     <Row>
                         <Col span={18} push={6} className='moduleDescriptionsTitleValue'>
-                            Jano
+                            {studentData.stuLastname || "Nom"}
                         </Col>
                         <Col span={6} pull={18} className='moduleDescriptionsTitle'>
                             Nom
@@ -151,7 +229,7 @@ function StudentEvaluation() {
                     </Row>
                     <Row>
                         <Col span={18} push={6} className='moduleDescriptionsTitleValue'>
-                            Kinan
+                            {studentData.stuFirstname || "Prenom"}
                         </Col>
                         <Col span={6} pull={18} className='moduleDescriptionsTitle'>
                             Prenom
@@ -159,7 +237,7 @@ function StudentEvaluation() {
                     </Row>
                     <Row>
                         <Col span={18} push={6} className='moduleDescriptionsTitleValue'>
-                            S304
+                            {evaluationData.evaLocation || "Salle"}
                         </Col>
                         <Col span={6} pull={18} className='moduleDescriptionsTitle'>
                             Salle
@@ -169,8 +247,8 @@ function StudentEvaluation() {
                         <Col span={6} className='moduleDescriptionsTitle'>
                             Note
                         </Col>
-                        <Col span={10} className='moduleDescriptionsTitleValue'>
-                            4.5
+                        <Col span={10} className={`moduleDescriptionsTitleValue ${getNoteClassName(roundedNote)}`}>
+                            {note} ({roundedNote})
                         </Col>
                         <Col span={2} className='moduleDescriptionsTitle'>
                             Date
@@ -180,11 +258,28 @@ function StudentEvaluation() {
                         </Col>
                     </Row>
                     <Divider></Divider>
-                    <Form form={form} onFinish={handleFinish}>
-                        <Collapse defaultActiveKey={['1', '2']}>
-                            {sourceData.map(obj => (
-                                <Panel header={obj.objTitle} key={obj.id}>
-                                    {obj.criterias.map(criteria => renderCriteria(criteria, obj.id, onScoreSelectChange, genericRemarks))}
+                    <Form form={form} onFinish={handleFinish} initialValues={form.getFieldsValue()}>
+                        <Collapse defaultActiveKey={Array.isArray(objectivesData) ? objectivesData.map(objective => objective.id_objective.toString()) : []}>
+                            {Array.isArray(objectivesData) && objectivesData.map(obj => (
+                                <Panel 
+                                header={
+                                    <Row>
+                                        <Col span={20}>
+                                            {obj.objTitle}
+                                        </Col>
+                                        <Col span={3} className='textRight'>
+                                            Poids
+                                        </Col>
+                                        <Col span={1} className='textRight'>
+                                            {obj.objWeight}
+                                        </Col>
+                                    </Row>
+                                } 
+                                key={obj.id_objective}
+                                >
+                                    {Array.isArray(obj.criterions) && obj.criterions.map(criteria => 
+                                        renderCriteria(criteria, obj.id_objective, onScoreSelectChange, genericRemarks, studentId)
+                                    )}
                                 </Panel>
                             ))}
                         </Collapse>

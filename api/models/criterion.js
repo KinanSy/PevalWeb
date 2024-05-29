@@ -20,7 +20,7 @@ const Criterion = sequelize.define('Criterion', {
     allowNull: true
   },
   criWeight: {
-    type: DataTypes.DECIMAL(2,2),
+    type: DataTypes.DECIMAL(4, 2), // Updated to DECIMAL(4, 2)
     allowNull: true
   },
   criLevel0Description: {
@@ -71,4 +71,3 @@ async function syncModel() {
 }
 
 syncModel();
-

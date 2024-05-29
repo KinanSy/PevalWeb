@@ -78,14 +78,38 @@ exports.updateEvaluation = async (req, res) => {
 exports.deleteEvaluation = async (req, res) => {
   const id = req.params.id;
   try {
-    const evaluation = await Evaluation.findByPk(id);
+    const evaluation = await Evaluation.findByPk(id, {
+      include: [
+        {
+          model: Objective,
+          as: 'objectives',
+          include: [
+            {
+              model: Criterion,
+              as: 'criterions'
+            }
+          ]
+        }
+      ]
+    });
+
     if (evaluation) {
+      // Delete related criterias
+      for (const objective of evaluation.objectives) {
+        for (const criterion of objective.criterions) {
+          await criterion.destroy();
+        }
+        await objective.destroy();
+      }
+
+      // Delete the evaluation
       await evaluation.destroy();
       res.json(evaluation);
     } else {
       res.status(404).json({ error: 'Evaluation not found' });
     }
   } catch (error) {
+    console.error('Error deleting evaluation:', error);
     res.status(500).json({ error: 'Internal Server Error' });
   }
 };

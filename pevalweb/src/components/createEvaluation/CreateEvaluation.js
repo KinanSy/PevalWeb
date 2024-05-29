@@ -5,10 +5,14 @@ import { DeleteOutlined } from '@ant-design/icons';
 import ObjectiveForm from './ObjectiveForm';
 import CriteriaForm from './CriteriaForm'; 
 import "./createEvaluation.css";
+import { useNavigate } from "react-router-dom";
+
 
 const { Step } = Steps;
 const { TextArea } = Input;
 const CreateEvaluation = () => {
+    const navigate = useNavigate();
+
     const [current, setCurrent] = useState(0);
     const [form] = Form.useForm();
     const [evaluation,setEvaluation] = useState({
@@ -54,7 +58,7 @@ const CreateEvaluation = () => {
             evaTitle: evaluation.evaTitle,
             evaDescription: evaluation.evaDescription,
             evaLocation: evaluation.evaLocation,
-            moduleId: evaluation.moduleid,
+            evaModuleId: evaluation.moduleid,
         })
         .catch(function (error){
             console.log(error)
@@ -109,7 +113,9 @@ const CreateEvaluation = () => {
                         console.log(error)
                     })
                 })
-            )
+            ).then(() => {
+                navigate("/Evaluation/" + createdEvaluationId)
+            })
         })         
     };
     

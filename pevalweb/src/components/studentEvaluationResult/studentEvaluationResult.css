@@ -13,3 +13,8 @@
 .noteGood {
     color: green;
 }
+
+.scoreValue{
+    text-align: center;
+    font-weight:bold;
+}

@@ -12,7 +12,7 @@ const Objective = sequelize.define('Objective', {
     allowNull: false
   },
   objWeight: {
-    type: DataTypes.DECIMAL(1,1),
+    type: DataTypes.DECIMAL(4, 2), // Updated to DECIMAL(4, 2)
     allowNull: true
   },
   objComment: {
@@ -39,11 +39,9 @@ Objective.associate = models => {
   });
 };
 
-
 module.exports = Objective;
 
 async function syncModel() {
     await Objective.sync();
 }
 syncModel();
-module.exports = Objective;

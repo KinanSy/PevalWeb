@@ -32,10 +32,9 @@ exports.createResult = async (req, res) => {
 };
 
 exports.getResult = async (req, res) => {
-  const { csrCriterionId, csrTeacherId, csrStudentId } = req.params;
+  const id = req.params.id;
   try {
-    const result = await CriterionStudentResult.findOne({
-      where: { csrCriterionId, csrTeacherId, csrStudentId },
+    const result = await CriterionStudentResult.findByPk(id, {
       include: [{ model: Criterion, as: 'criterion' }]
     });
     if (result) {
@@ -50,11 +49,10 @@ exports.getResult = async (req, res) => {
 };
 
 exports.updateResult = async (req, res) => {
-  const { csrCriterionId, csrTeacherId, csrStudentId, csrScore, csrComment } = req.body;
+  const id = req.params.id;
+  const { csrScore, csrComment } = req.body;
   try {
-    const result = await CriterionStudentResult.findOne({
-      where: { csrCriterionId, csrTeacherId, csrStudentId }
-    });
+    const result = await CriterionStudentResult.findByPk(id);
     if (result) {
       result.csrScore = csrScore;
       result.csrComment = csrComment;
@@ -70,11 +68,9 @@ exports.updateResult = async (req, res) => {
 };
 
 exports.deleteResult = async (req, res) => {
-  const { csrCriterionId, csrTeacherId, csrStudentId } = req.params;
+  const id = req.params.id;
   try {
-    const result = await CriterionStudentResult.findOne({
-      where: { csrCriterionId, csrTeacherId, csrStudentId }
-    });
+    const result = await CriterionStudentResult.findByPk(id);
     if (result) {
       await result.destroy();
       res.json({ message: 'Result deleted successfully' });

@@ -4,8 +4,8 @@ const criterionStudentResultController = require('../controllers/criterionStuden
 
 router.get('/', criterionStudentResultController.getAllResults);
 router.post('/', criterionStudentResultController.createResult);
-router.get('/:csrCriterionId/:csrTeacherId/:csrStudentId', criterionStudentResultController.getResult);
-router.put('/:csrCriterionId/:csrTeacherId/:csrStudentId', criterionStudentResultController.updateResult);
-router.delete('/:csrCriterionId/:csrTeacherId/:csrStudentId', criterionStudentResultController.deleteResult);
+router.get('/:id', criterionStudentResultController.getResult);
+router.put('/:id', criterionStudentResultController.updateResult);
+router.delete('/:id', criterionStudentResultController.deleteResult);
 
 module.exports = router;
