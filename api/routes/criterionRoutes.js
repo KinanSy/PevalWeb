@@ -2,19 +2,19 @@ const express = require('express');
 const router = express.Router();
 const criterionController = require('../controllers/criterionController');
 
-// Route to get all criteria
+// Route pour obtenir tous les critères
 router.get('/', criterionController.getAllCriteria);
 
-// Route to create a new criterion
+// Route pour créer un nouveau critère
 router.post('/', criterionController.createCriterion);
 
-// Route to get a criterion by ID
+// Route pour obtenir un critère par ID
 router.get('/:id', criterionController.getCriterionById);
 
-// Route to update a criterion by ID
+// Route pour mettre à jour un critère par ID
 router.put('/:id', criterionController.updateCriterion);
 
-// Route to delete a criterion by ID
+// Route pour supprimer un critère par ID
 router.delete('/:id', criterionController.deleteCriterion);
 
 module.exports = router;

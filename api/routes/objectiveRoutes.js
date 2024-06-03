@@ -2,19 +2,19 @@ const express = require('express');
 const router = express.Router();
 const objectiveController = require('../controllers/objectiveController');
 
-// Route to get all objectives
+// Route pour obtenir tous les objectifs
 router.get('/', objectiveController.getAllObjectives);
 
-// Route to create a new objective
+// Route pour créer un nouvel objectif
 router.post('/', objectiveController.createObjective);
 
-// Route to get an objective by ID
+// Route pour obtenir un objectif par ID
 router.get('/:id', objectiveController.getObjectiveById);
 
-// Route to update an objective by ID
+// Route pour mettre à jour un objectif par ID
 router.put('/:id', objectiveController.updateObjective);
 
-// Route to delete an objective by ID
+// Route pour supprimer un objectif par ID
 router.delete('/:id', objectiveController.deleteObjective);
 
 module.exports = router;

@@ -1,20 +1,23 @@
-import React, { useContext } from 'react';
+import { useContext } from 'react';
 import { Form, Input, Button, message } from 'antd';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import './login.css'; 
-import { AuthContext } from '../../AuthContext';
+import { AuthContext } from '../common/AuthContext';
 
 function Login() {
   const navigate = useNavigate();
   const { setAuth } = useContext(AuthContext);
 
+  // Fonction exécutée à la soumission du formulaire
   const onFinish = (values) => {
+    // Requête POST pour authentifier l'utilisateur
     axios.post(`${process.env.REACT_APP_API_HOST}/auth/login`, {
       username: values.username,
       password: values.password
     })
     .then(response => {
+      // Si la connexion est réussie, enregistrer les informations dans le localStorage
       const { token, id, name } = response.data;
       localStorage.setItem('token', token);
       localStorage.setItem('teacherId', id);
@@ -24,6 +27,7 @@ function Login() {
       navigate('/');
     })
     .catch(error => {
+      // Gérer les erreurs de connexion
       if (error.response && error.response.status === 401) {
         message.error('Nom d\'utilisateur ou mot de passe incorrects');
       } else {

@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Form, Card, Row, Col, Divider, Input, Select, Collapse, Tooltip, message } from 'antd';
 import { SaveOutlined } from '@ant-design/icons';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import "./studentEvaluation.css";
+
 
 const { Option } = Select;
 const { Panel } = Collapse;
@@ -74,7 +75,6 @@ function StudentEvaluation() {
     useEffect(() => {
         axios.get(`${process.env.REACT_APP_API_HOST}/evaluations/${evalId}`)
         .then(res => {
-            console.log(res.data["objectives"]);
             setObjectivesData(res.data["objectives"] || []);
             calculateNoteFromData(res.data["objectives"]);
             setEvaluationData(res.data);
@@ -82,7 +82,9 @@ function StudentEvaluation() {
             console.error('Error fetching evaluation data:', err);
             setObjectivesData([]);
         });
-    }, [evalId]);
+    }, 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [evalId]);
 
     useEffect(() => {
         axios.get(`${process.env.REACT_APP_API_HOST}/students/${studentId}`)
@@ -142,6 +144,7 @@ function StudentEvaluation() {
         setNote(calculatedNote.toFixed(1));
         setRoundedNote(calculatedRoundedNote.toFixed(1));
     };
+
     const getNoteClassName = (note) => {
         if (note >= 1 && note < 3.5) {
             return 'noteMediocre';
@@ -159,13 +162,12 @@ function StudentEvaluation() {
     }
 
     function handleFinish(values) {
-        console.log('Form values:', values);
-
         calculateNote(values);
 
         const updates = [];
         for (const key in values) {
             if (key.startsWith('score-')) {
+                // eslint-disable-next-line no-unused-vars
                 const [_, objectiveId, criteriaId, studentId] = key.split('-');
                 const score = values[key];
                 const commentKey = `personalRemark-${objectiveId}-${criteriaId}-${studentId}`;
@@ -259,7 +261,7 @@ function StudentEvaluation() {
                     </Row>
                     <Divider></Divider>
                     <Form form={form} onFinish={handleFinish} initialValues={form.getFieldsValue()}>
-                        <Collapse defaultActiveKey={Array.isArray(objectivesData) ? objectivesData.map(objective => objective.id_objective.toString()) : []}>
+                        <Collapse activeKey={Array.isArray(objectivesData) ? objectivesData.map(objective => objective.id_objective.toString()) : []}>
                             {Array.isArray(objectivesData) && objectivesData.map(obj => (
                                 <Panel 
                                 header={

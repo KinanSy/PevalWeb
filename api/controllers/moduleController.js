@@ -1,16 +1,19 @@
 const db = require('../models');
 const Module = db.Module;
-// Get all modules
+
+// Obtenir tous les modules
 exports.getAllModules = async (req, res) => {
   try {
     const modules = await Module.findAll();
+    // Envoyer les modules en réponse au format JSON
     res.json(modules);
   } catch (error) {
-    res.status(500).json({ error: 'Internal Server Error' });
+    // Gérer les erreurs serveur
+    res.status(500).json({ error: 'Erreur serveur interne' });
   }
 };
 
-// Create a new module
+// Créer un nouveau module
 exports.createModule = async (req, res) => {
   const { modTitle, modNumber } = req.body;
   try {
@@ -18,28 +21,33 @@ exports.createModule = async (req, res) => {
       modTitle,
       modNumber
     });
-    res.status(201).json(newModule);
+    // Répondre avec le nouveau module au format JSON
+    res.status(201).json({ message: 'Module créé avec succès', data: newModule });
   } catch (error) {
-    res.status(500).json({ error: 'Internal Server Error' });
+    // Gérer les erreurs serveur
+    res.status(500).json({ error: 'Erreur serveur interne' });
   }
 };
 
-// Get a module by ID
+// Obtenir un module par ID
 exports.getModuleById = async (req, res) => {
   const id = req.params.id;
   try {
     const module = await Module.findByPk(id);
     if (module) {
+      // Répondre avec le module au format JSON
       res.json(module);
     } else {
-      res.status(404).json({ error: 'Module not found' });
+      // Envoyer une erreur 404 si le module n'est pas trouvé
+      res.status(404).json({ error: 'Module non trouvé' });
     }
   } catch (error) {
-    res.status(500).json({ error: 'Internal Server Error' });
+    // Gérer les erreurs serveur
+    res.status(500).json({ error: 'Erreur serveur interne' });
   }
 };
 
-// Update a module by ID
+// Mettre à jour un module par ID
 exports.updateModule = async (req, res) => {
   const id = req.params.id;
   const { modTitle, modNumber } = req.body;
@@ -48,28 +56,35 @@ exports.updateModule = async (req, res) => {
     if (module) {
       module.modTitle = modTitle;
       module.modNumber = modNumber;
+      // Sauvegarder les modifications
       await module.save();
-      res.json(module);
+      // Répondre avec le module mis à jour au format JSON
+      res.json({ message: 'Module mis à jour avec succès', data: module });
     } else {
-      res.status(404).json({ error: 'Module not found' });
+      // Envoyer une erreur 404 si le module n'est pas trouvé
+      res.status(404).json({ error: 'Module non trouvé' });
     }
   } catch (error) {
-    res.status(500).json({ error: 'Internal Server Error' });
+    // Gérer les erreurs serveur
+    res.status(500).json({ error: 'Erreur serveur interne' });
   }
 };
 
-// Delete a module by ID
+// Supprimer un module par ID
 exports.deleteModule = async (req, res) => {
   const id = req.params.id;
   try {
     const module = await Module.findByPk(id);
     if (module) {
       await module.destroy();
-      res.json(module);
+      // Répondre avec un message de succès
+      res.json({ message: 'Module supprimé avec succès' });
     } else {
-      res.status(404).json({ error: 'Module not found' });
+      // Envoyer une erreur 404 si le module n'est pas trouvé
+      res.status(404).json({ error: 'Module non trouvé' });
     }
   } catch (error) {
-    res.status(500).json({ error: 'Internal Server Error' });
+    // Gérer les erreurs serveur
+    res.status(500).json({ error: 'Erreur serveur interne' });
   }
 };

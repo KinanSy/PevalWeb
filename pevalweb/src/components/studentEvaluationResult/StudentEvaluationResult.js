@@ -1,23 +1,23 @@
-import React, { useState, useEffect } from 'react';
-import { Card, Row, Col, Divider, Collapse, Tooltip } from 'antd';
+import { useState, useEffect } from 'react';
+import { Card, Row, Col, Divider, Collapse } from 'antd';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import "./studentEvaluationResult.css";
 
 const { Panel } = Collapse;
 
+// Fonction pour afficher les détails d'un critère
 function renderCriteriaView(criteria, objectiveId, studentId) {
     const result = criteria.criterionResults.find(r => r.csrStudentId == studentId) || {};
     const criteriaId = criteria.id_criterion;
-    const scoreKey = `${objectiveId}-${criteriaId}-${studentId}`;
     const genericRemark = criteria[`criLevel${result.csrScore}Description`] || 'Remarque generique';
 
     const getScoreClassName = (score) => {
         if (score >= 0 && score <= 1) {
             return 'noteMediocre';
-        } else if (score === 2) {
+        } else if (score == 2) {
             return 'noteAverage';
-        } else if (score === 3) {
+        } else if (score == 3) {
             return 'noteGood';
         }
         return '';
@@ -69,20 +69,25 @@ function StudentEvaluationResult() {
     const [note, setNote] = useState(1);
     const [roundedNote, setRoundedNote] = useState(1);
 
+    
+    // Récupérer les données de l'évaluation
     useEffect(() => {
         axios.get(`${process.env.REACT_APP_API_HOST}/evaluations/${evalId}`)
         .then(res => {
             const evaluation = res.data;
             console.log(evaluation["objectives"]);
             setObjectivesData(evaluation["objectives"] || []);
-            setEvaluationData(evaluation); // Store entire evaluation data
-            calculateNoteFromData(evaluation["objectives"]); // Calculate note from fetched data
+            setEvaluationData(evaluation);
+            calculateNoteFromData(evaluation["objectives"]);
         }).catch(err => {
             console.error('Error fetching evaluation data:', err);
             setObjectivesData([]);
         });
-    }, [evalId]);
-
+    }, 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [evalId]);
+    
+    // Récupérer les données de l'étudiant
     useEffect(() => {
         axios.get(`${process.env.REACT_APP_API_HOST}/students/${studentId}`)
         .then(res => {
@@ -92,6 +97,7 @@ function StudentEvaluationResult() {
         });
     }, [studentId]);
 
+    // Calculer la note à partir des données de l'évaluation
     const calculateNoteFromData = (data) => {
         let totalScore = 0;
         let totalWeight = 0;
@@ -117,6 +123,7 @@ function StudentEvaluationResult() {
         setRoundedNote(calculatedRoundedNote.toFixed(1));
     };
 
+    // Déterminer la classe CSS en fonction de la note
     const getNoteClassName = (note) => {
         if (note >= 1 && note < 4) {
             return 'noteMediocre';
@@ -171,7 +178,7 @@ function StudentEvaluationResult() {
                         </Col>
                     </Row>
                     <Divider></Divider>
-                    <Collapse defaultActiveKey={Array.isArray(objectivesData) ? objectivesData.map(objective => objective.id_objective.toString()) : []}>
+                    <Collapse activeKey={Array.isArray(objectivesData) ? objectivesData.map(objective => objective.id_objective.toString()) : []}>
                         {Array.isArray(objectivesData) && objectivesData.map(obj => (
                             <Panel 
                             header={
@@ -187,7 +194,7 @@ function StudentEvaluationResult() {
                                     </Col>
                                 </Row>
                             } 
-                            key={obj.id_objective}
+                            key={obj.id_objective.toString()}
                             >
                                 {Array.isArray(obj.criterions) && obj.criterions.map(criteria => 
                                     renderCriteriaView(criteria, obj.id_objective, studentId)

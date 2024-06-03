@@ -11,6 +11,7 @@ const objectiveRoutes = require('./routes/objectiveRoutes');
 const criterionRoutes = require('./routes/criterionRoutes');
 const criterionStudentResultRoutes = require('./routes/criterionStudentResultRoutes');
 const authRoutes = require('./routes/authRoutes');
+const studentTokenRoutes = require('./routes/studentTokenRoutes');
 
 // Connexion à la base de données
 database.authenticate()
@@ -20,7 +21,7 @@ database.authenticate()
 // Middleware pour parser les requêtes JSON
 app.use(express.json());
 
-// Middleware pour permettre les requêtes CORS
+// Middleware CORS
 app.use(cors());
 
 // Définition des routes
@@ -32,8 +33,9 @@ app.use('/objectives', objectiveRoutes);
 app.use('/criterions', criterionRoutes);
 app.use('/results', criterionStudentResultRoutes);
 app.use('/auth', authRoutes);
+app.use('/tokens', studentTokenRoutes);
 
-// Définition du port et démarrage du serveur
+// Démarrage du serveur
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Peval Web API sur le port ${PORT}`);

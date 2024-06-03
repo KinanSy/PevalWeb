@@ -1,6 +1,7 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
 
+// Définir le modèle Criterion
 const Criterion = sequelize.define('Criterion', {
   id_criterion: {
     type: DataTypes.INTEGER,
@@ -20,7 +21,7 @@ const Criterion = sequelize.define('Criterion', {
     allowNull: true
   },
   criWeight: {
-    type: DataTypes.DECIMAL(4, 2), // Updated to DECIMAL(4, 2)
+    type: DataTypes.DECIMAL(4, 2),
     allowNull: true
   },
   criLevel0Description: {
@@ -52,6 +53,7 @@ const Criterion = sequelize.define('Criterion', {
   timestamps: false 
 });
 
+// Définir les associations du modèle Criterion
 Criterion.associate = models => {
   Criterion.hasMany(models.CriterionStudentResult, {
       as: 'criterionResults',
@@ -66,8 +68,14 @@ Criterion.associate = models => {
 
 module.exports = Criterion;
 
+// Synchroniser le modèle avec la base de données
 async function syncModel() {
+  try {
     await Criterion.sync();
+    console.log('Modèle Criterion synchronisé avec succès.');
+  } catch (error) {
+    console.error('Erreur de synchronisation du modèle Criterion :', error);
+  }
 }
 
 syncModel();

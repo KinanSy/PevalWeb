@@ -1,6 +1,7 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
 
+// Définir le modèle Evaluation
 const Evaluation = sequelize.define('Evaluation', {
   id_evaluation: {
     type: DataTypes.INTEGER,
@@ -47,6 +48,7 @@ const Evaluation = sequelize.define('Evaluation', {
   timestamps: false,
 });
 
+// Définir les associations du modèle Evaluation
 Evaluation.associate = models => {
   Evaluation.belongsTo(models.Module, {
     as: 'module',
@@ -60,8 +62,14 @@ Evaluation.associate = models => {
 
 module.exports = Evaluation;
 
+// Synchroniser le modèle avec la base de données
 async function syncModel() {
-  await Evaluation.sync();
+  try {
+    await Evaluation.sync();
+    console.log('Modèle Evaluation synchronisé avec succès.');
+  } catch (error) {
+    console.error('Erreur de synchronisation du modèle Evaluation :', error);
+  }
 }
 
 syncModel();

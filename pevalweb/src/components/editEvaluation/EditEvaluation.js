@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Steps, Form, Button, Card, Input, Select, Row, Col } from 'antd';
-import { DeleteOutlined } from '@ant-design/icons';
+import { Steps, Form, Button, Card, Input, Select } from 'antd';
 import ObjectiveForm from './ObjectiveForm';
 import CriteriaForm from './CriteriaForm';
 import "./editEvaluation.css";
@@ -11,7 +10,7 @@ const { Step } = Steps;
 const { TextArea } = Input;
 
 const EditEvaluation = () => {
-    const { id } = useParams(); // Get evaluation ID from route params
+    const { id } = useParams(); // Récupérer l'ID de l'évaluation à partir des paramètres de la route
     const navigate = useNavigate();
     const [current, setCurrent] = useState(0);
     const [form] = Form.useForm();
@@ -25,6 +24,7 @@ const EditEvaluation = () => {
     const [criterias, setCriterias] = useState([]);
     const [modules, setModules] = useState([]);
 
+    // Récupérer les modules et les détails de l'évaluation lors du chargement du composant
     useEffect(() => {
         axios.get(process.env.REACT_APP_API_HOST + "/modules/")
             .then(res => {
@@ -45,15 +45,15 @@ const EditEvaluation = () => {
                     evaTitle: evalData.evaTitle,
                     evaDescription: evalData.evaDescription,
                 });
-                setObjectives(evalData.objectives.map((obj, index) => ({
+                setObjectives(evalData.objectives.map((obj) => ({
                     id: obj.id_objective,
                     title: obj.objTitle,
                     weight: obj.objWeight,
                     comment: obj.objComment
                 })));
                 const criteriaList = [];
-                evalData.objectives.forEach((objective, objIndex) => {
-                    objective.criterions.forEach((criteria, criIndex) => {
+                evalData.objectives.forEach((objective) => {
+                    objective.criterions.forEach((criteria) => {
                         criteriaList.push({
                             id: criteria.id_criterion,
                             objectiveId: objective.id_objective,
@@ -71,7 +71,7 @@ const EditEvaluation = () => {
                 });
                 setCriterias(criteriaList);
 
-                // Set form values
+                // Définir les valeurs initiales du formulaire
                 form.setFieldsValue({
                     moduleId: evalData.evaModuleId,
                     evaLocation: evalData.evaLocation,
@@ -79,26 +79,29 @@ const EditEvaluation = () => {
                     evaDescription: evalData.evaDescription,
                 });
             });
-    }, [id]);
+    }, 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [id]);
 
+    // Passer à l'étape suivante
     const next = () => {
         setCurrent(current + 1);
-        console.log(evaluation);
-        console.log(objectives);
-        console.log(criterias);
     };
 
+    // Mettre à jour les données de l'évaluation
     const updateEvaluationData = (field, value) => {
         const updatedEvaluation = { ...evaluation, [field]: value };
         setEvaluation(updatedEvaluation);
     };
 
+    // Revenir à l'étape précédente
     const prev = () => {
         setCurrent(current - 1);
     };
 
-    const onFinish = async (values) => {
-        // Update evaluation
+    // Soumettre les modifications
+    const onFinish = async () => {
+        // Mettre à jour l'évaluation
         await axios.put(process.env.REACT_APP_API_HOST + "/evaluations/" + id, {
             evaTitle: evaluation.evaTitle,
             evaDescription: evaluation.evaDescription,
@@ -108,9 +111,9 @@ const EditEvaluation = () => {
             console.log(error);
         });
 
-        // Update objectives and criteria
+        // Mettre à jour les objectifs et les critères
         await Promise.all(
-            objectives.map(async (objective, objIndex) => {
+            objectives.map(async (objective) => {
                 await axios.put(process.env.REACT_APP_API_HOST + "/objectives/" + objective.id, {
                     objTitle: objective.title,
                     objWeight: objective.weight,
@@ -122,7 +125,7 @@ const EditEvaluation = () => {
 
                 const relatedCriterias = criterias.filter(cri => cri.objectiveId === objective.id);
                 await Promise.all(
-                    relatedCriterias.map(async (criteria, criIndex) => {
+                    relatedCriterias.map(async (criteria) => {
                         await axios.put(process.env.REACT_APP_API_HOST + "/criterions/" + criteria.id, {
                             criTitle: criteria.title,
                             criConditionsDescription: criteria.conditionsDescription,
@@ -140,7 +143,7 @@ const EditEvaluation = () => {
                 );
             })
         ).then(() => {
-            navigate("/Evaluation/" + id);
+            navigate("/evaluation/" + id);
         });
     };
 
@@ -172,22 +175,22 @@ const EditEvaluation = () => {
                             </div>
                         )}
                         {current === 1 && (
-                            <ObjectiveForm objectives={objectives} setObjectives={setObjectives} form={form}></ObjectiveForm>
+                            <ObjectiveForm objectives={objectives} setObjectives={setObjectives} form={form} />
                         )}
                         {current === 2 && (
-                            <CriteriaForm objectives={objectives} criterias={criterias} setCriterias={setCriterias} form={form}></CriteriaForm>
+                            <CriteriaForm objectives={objectives} criterias={criterias} setCriterias={setCriterias} form={form} />
                         )}
                     </div>
                 </div>
 
                 <div className="stepsActions">
                     {current > 0 && (
-                        <Button style={{ margin: '0 8px' }} onClick={() => prev()}>
+                        <Button style={{ margin: '0 8px' }} onClick={prev}>
                             Précédent
                         </Button>
                     )}
                     {current < 2 && (
-                        <Button type="primary" onClick={() => next()}>
+                        <Button type="primary" onClick={next}>
                             Suivant
                         </Button>
                     )}

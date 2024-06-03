@@ -2,10 +2,11 @@ import React, { useEffect } from 'react';
 import { Form, Button, Card, Input, Row, Col } from 'antd';
 import { DeleteOutlined } from '@ant-design/icons';
 import "./editEvaluation.css";
+
 const { TextArea } = Input;
 
 function ObjectiveForm({ objectives, setObjectives, form }) {
-
+    // Charger les valeurs initiales dans le formulaire lors du montage du composant
     useEffect(() => {
         objectives.forEach(objective => {
             form.setFieldsValue({
@@ -16,6 +17,7 @@ function ObjectiveForm({ objectives, setObjectives, form }) {
         });
     }, [objectives, form]);
 
+    // Ajouter un objectif
     const addObjective = () => {
         const newObjective = {
             id: objectives.length + 1,
@@ -26,16 +28,18 @@ function ObjectiveForm({ objectives, setObjectives, form }) {
         setObjectives([...objectives, newObjective]);
     };
 
+    // Mettre à jour un objectif
     const updateObjective = (id, field, value) => {
-        const newObjectives = objectives.map(obj => {
+        const updatedObjectives = objectives.map(obj => {
             if (obj.id === id) {
                 return { ...obj, [field]: value };
             }
             return obj;
         });
-        setObjectives(newObjectives);
+        setObjectives(updatedObjectives);
     };
 
+    // Supprimer un objectif
     const removeObjective = id => {
         setObjectives(objectives.filter(obj => obj.id !== id));
     };
@@ -51,7 +55,11 @@ function ObjectiveForm({ objectives, setObjectives, form }) {
                     >
                         <Row gutter={16}>
                             <Col span={20}>
-                                <Form.Item name={`objTitle-${objective.id}`} initialValue={objective.title} rules={[{ required: true }]}>
+                                <Form.Item 
+                                    name={`objTitle-${objective.id}`} 
+                                    initialValue={objective.title} 
+                                    rules={[{ required: true, message: 'Veuillez entrer le titre de l\'objectif' }]}
+                                >
                                     <Input
                                         placeholder="Titre de l'objectif"
                                         value={objective.title}
@@ -60,7 +68,11 @@ function ObjectiveForm({ objectives, setObjectives, form }) {
                                 </Form.Item>
                             </Col>
                             <Col span={4}>
-                                <Form.Item name={`objWeight-${objective.id}`} initialValue={objective.weight} rules={[{ required: true }]}>
+                                <Form.Item 
+                                    name={`objWeight-${objective.id}`} 
+                                    initialValue={objective.weight} 
+                                    rules={[{ required: true, message: 'Veuillez entrer le poids de l\'objectif' }]}
+                                >
                                     <Input
                                         placeholder="Poids"
                                         value={objective.weight}
@@ -69,7 +81,11 @@ function ObjectiveForm({ objectives, setObjectives, form }) {
                                 </Form.Item>
                             </Col>
                         </Row>
-                        <Form.Item name={`objComment-${objective.id}`} initialValue={objective.comment} rules={[{ required: true }]}>
+                        <Form.Item 
+                            name={`objComment-${objective.id}`} 
+                            initialValue={objective.comment} 
+                            rules={[{ required: true, message: 'Veuillez entrer un commentaire pour l\'objectif' }]}
+                        >
                             <TextArea
                                 rows={4}
                                 placeholder="Commentaire / description de l'objectif"

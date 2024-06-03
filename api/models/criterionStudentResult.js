@@ -1,6 +1,7 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
 
+// Définir le modèle CriterionStudentResult
 const CriterionStudentResult = sequelize.define('CriterionStudentResult', {
   id_criterionStudentResult: {
     type: DataTypes.INTEGER,
@@ -39,6 +40,7 @@ const CriterionStudentResult = sequelize.define('CriterionStudentResult', {
   timestamps: false
 });
 
+// Définir les associations du modèle CriterionStudentResult
 CriterionStudentResult.associate = models => {
   CriterionStudentResult.belongsTo(models.Criterion, {
     as: 'criterion',
@@ -53,11 +55,17 @@ CriterionStudentResult.associate = models => {
     foreignKey: 'csrStudentId'
   });
 };
+
 module.exports = CriterionStudentResult;
 
+// Synchroniser le modèle avec la base de données
 async function syncModel() {
+  try {
     await CriterionStudentResult.sync();
+    console.log('Modèle CriterionStudentResult synchronisé avec succès.');
+  } catch (error) {
+    console.error('Erreur de synchronisation du modèle CriterionStudentResult :', error);
+  }
 }
 
 syncModel();
-

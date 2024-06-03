@@ -1,48 +1,54 @@
 const db = require('../models');
 const Student = db.Student;
 
-// Get all students
+// Obtenir tous les étudiants
 exports.getAllStudents = async (req, res) => {
   try {
     const students = await Student.findAll();
+    // Envoyer les étudiants en réponse au format JSON
     res.json(students);
   } catch (error) {
-    res.status(500).json({ error: 'Internal Server Error' });
+    // Gérer les erreurs serveur
+    res.status(500).json({ error: 'Erreur serveur interne' });
   }
 };
 
-// Create a new student
+// Créer un nouvel étudiant
 exports.createStudent = async (req, res) => {
-  console.log("Crate")
   const { stuFirstname, stuLastname, stuToken } = req.body;
-  // try {
+  try {
     const newStudent = await Student.create({
       stuFirstname,
       stuLastname,
       stuToken,
     });
-    res.status(201).json(newStudent);
-  // } catch (error) {
-  //   res.status(500).json({ error: 'Internal Server Error' });
-  // }
+    // Répondre avec le nouvel étudiant au format JSON
+    res.status(201).json({ message: 'Étudiant créé avec succès', data: newStudent });
+  } catch (error) {
+    // Gérer les erreurs serveur
+    res.status(500).json({ error: 'Erreur serveur interne' });
+  }
 };
 
-// Get a student by ID
+// Obtenir un étudiant par ID
 exports.getStudentById = async (req, res) => {
   const id = req.params.id;
   try {
     const student = await Student.findByPk(id);
     if (student) {
+      // Répondre avec l'étudiant au format JSON
       res.json(student);
     } else {
-      res.status(404).json({ error: 'Student not found' });
+      // Envoyer une erreur 404 si l'étudiant n'est pas trouvé
+      res.status(404).json({ error: 'Étudiant non trouvé' });
     }
   } catch (error) {
-    res.status(500).json({ error: 'Internal Server Error' });
+    // Gérer les erreurs serveur
+    res.status(500).json({ error: 'Erreur serveur interne' });
   }
 };
 
-// Update a student by ID
+// Mettre à jour un étudiant par ID
 exports.updateStudent = async (req, res) => {
   const id = req.params.id;
   const { stuFirstname, stuLastname, stuToken } = req.body;
@@ -51,29 +57,36 @@ exports.updateStudent = async (req, res) => {
     if (student) {
       student.stuFirstname = stuFirstname;
       student.stuLastname = stuLastname;
-      student.stuToken = stuToken; // Optional update to token if needed
+      student.stuToken = stuToken;
+      // Sauvegarder les modifications
       await student.save();
-      res.json(student);
+      // Répondre avec l'étudiant mis à jour au format JSON
+      res.json({ message: 'Étudiant mis à jour avec succès', data: student });
     } else {
-      res.status(404).json({ error: 'Student not found' });
+      // Envoyer une erreur 404 si l'étudiant n'est pas trouvé
+      res.status(404).json({ error: 'Étudiant non trouvé' });
     }
   } catch (error) {
-    res.status(500).json({ error: 'Internal Server Error' });
+    // Gérer les erreurs serveur
+    res.status(500).json({ error: 'Erreur serveur interne' });
   }
 };
 
-// Delete a student by ID
+// Supprimer un étudiant par ID
 exports.deleteStudent = async (req, res) => {
   const id = req.params.id;
   try {
     const student = await Student.findByPk(id);
     if (student) {
       await student.destroy();
-      res.json(student);
+      // Répondre avec un message de succès
+      res.json({ message: 'Étudiant supprimé avec succès' });
     } else {
-      res.status(404).json({ error: 'Student not found' });
+      // Envoyer une erreur 404 si l'étudiant n'est pas trouvé
+      res.status(404).json({ error: 'Étudiant non trouvé' });
     }
   } catch (error) {
-    res.status(500).json({ error: 'Internal Server Error' });
+    // Gérer les erreurs serveur
+    res.status(500).json({ error: 'Erreur serveur interne' });
   }
 };

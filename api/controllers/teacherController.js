@@ -1,16 +1,19 @@
 const db = require('../models');
 const Teacher = db.Teacher;
-// Get all teachers
+
+// Obtenir tous les enseignants
 exports.getAllTeachers = async (req, res) => {
   try {
     const teachers = await Teacher.findAll();
+    // Envoyer les enseignants en réponse au format JSON
     res.json(teachers);
   } catch (error) {
-    res.status(500).json({ error: 'Internal Server Error' });
+    // Gérer les erreurs serveur
+    res.status(500).json({ error: 'Erreur serveur interne' });
   }
 };
 
-// Create a new teacher
+// Créer un nouvel enseignant
 exports.createTeacher = async (req, res) => {
   const { teaFirstname, teaLastname, teaUsername, teaPassword } = req.body;
   try {
@@ -20,28 +23,33 @@ exports.createTeacher = async (req, res) => {
       teaUsername,
       teaPassword,
     });
-    res.status(201).json(newTeacher);
+    // Répondre avec le nouvel enseignant au format JSON
+    res.status(201).json({ message: 'Enseignant créé avec succès', data: newTeacher });
   } catch (error) {
-    res.status(500).json({ error: 'Internal Server Error' });
+    // Gérer les erreurs serveur
+    res.status(500).json({ error: 'Erreur serveur interne' });
   }
 };
 
-// Get a teacher by ID
+// Obtenir un enseignant par ID
 exports.getTeacherById = async (req, res) => {
   const id = req.params.id;
   try {
     const teacher = await Teacher.findByPk(id);
     if (teacher) {
+      // Répondre avec l'enseignant au format JSON
       res.json(teacher);
     } else {
-      res.status(404).json({ error: 'Teacher not found' });
+      // Envoyer une erreur 404 si l'enseignant n'est pas trouvé
+      res.status(404).json({ error: 'Enseignant non trouvé' });
     }
   } catch (error) {
-    res.status(500).json({ error: 'Internal Server Error' });
+    // Gérer les erreurs serveur
+    res.status(500).json({ error: 'Erreur serveur interne' });
   }
 };
 
-// Update a teacher by ID
+// Mettre à jour un enseignant par ID
 exports.updateTeacher = async (req, res) => {
   const id = req.params.id;
   const { teaFirstname, teaLastname, teaUsername, teaPassword } = req.body;
@@ -52,28 +60,35 @@ exports.updateTeacher = async (req, res) => {
       teacher.teaLastname = teaLastname;
       teacher.teaUsername = teaUsername;
       teacher.teaPassword = teaPassword;
+      // Sauvegarder les modifications
       await teacher.save();
-      res.json(teacher);
+      // Répondre avec l'enseignant mis à jour au format JSON
+      res.json({ message: 'Enseignant mis à jour avec succès', data: teacher });
     } else {
-      res.status(404).json({ error: 'Teacher not found' });
+      // Envoyer une erreur 404 si l'enseignant n'est pas trouvé
+      res.status(404).json({ error: 'Enseignant non trouvé' });
     }
   } catch (error) {
-    res.status(500).json({ error: 'Internal Server Error' });
+    // Gérer les erreurs serveur
+    res.status(500).json({ error: 'Erreur serveur interne' });
   }
 };
 
-// Delete a teacher by ID
+// Supprimer un enseignant par ID
 exports.deleteTeacher = async (req, res) => {
   const id = req.params.id;
   try {
     const teacher = await Teacher.findByPk(id);
     if (teacher) {
       await teacher.destroy();
-      res.json(teacher);
+      // Répondre avec un message de succès
+      res.json({ message: 'Enseignant supprimé avec succès' });
     } else {
-      res.status(404).json({ error: 'Teacher not found' });
+      // Envoyer une erreur 404 si l'enseignant n'est pas trouvé
+      res.status(404).json({ error: 'Enseignant non trouvé' });
     }
   } catch (error) {
-    res.status(500).json({ error: 'Internal Server Error' });
+    // Gérer les erreurs serveur
+    res.status({error: 'Erreur serveur interne' });
   }
 };

@@ -1,6 +1,7 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
 
+// Définir le modèle Objective
 const Objective = sequelize.define('Objective', {
   id_objective: {
     type: DataTypes.INTEGER,
@@ -12,7 +13,7 @@ const Objective = sequelize.define('Objective', {
     allowNull: false
   },
   objWeight: {
-    type: DataTypes.DECIMAL(4, 2), // Updated to DECIMAL(4, 2)
+    type: DataTypes.DECIMAL(4, 2),
     allowNull: true
   },
   objComment: {
@@ -32,6 +33,7 @@ const Objective = sequelize.define('Objective', {
   timestamps: false 
 });
 
+// Définir les associations du modèle Objective
 Objective.associate = models => {
   Objective.hasMany(models.Criterion, {
     as: 'criterions',
@@ -41,7 +43,14 @@ Objective.associate = models => {
 
 module.exports = Objective;
 
+// Synchroniser le modèle avec la base de données
 async function syncModel() {
+  try {
     await Objective.sync();
+    console.log('Modèle Objective synchronisé avec succès.');
+  } catch (error) {
+    console.error('Erreur de synchronisation du modèle Objective :', error);
+  }
 }
+
 syncModel();

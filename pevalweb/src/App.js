@@ -1,6 +1,8 @@
 import React, { useContext } from "react";
 import { createBrowserRouter, RouterProvider, Navigate } from "react-router-dom";
-import Layouta from "./components/common/Layout";
+import { ConfigProvider, Spin } from "antd";
+import { AuthProvider, AuthContext } from "./components/common/AuthContext";
+import MainLayout from "./components/common/MainLayout";
 import Home from "./components/home/Home";
 import Login from "./components/login/Login";
 import CreateEvaluation from "./components/createEvaluation/CreateEvaluation";
@@ -8,29 +10,35 @@ import Evaluation from "./components/evaluation/Evaluation";
 import StudentEvaluation from "./components/studentEvaluation/StudentEvaluation";
 import StudentEvaluationResult from "./components/studentEvaluationResult/StudentEvaluationResult";
 import EditEvaluation from "./components/editEvaluation/EditEvaluation";
-import { ConfigProvider, Spin } from "antd";
-import { AuthProvider, AuthContext } from "./AuthContext";
+import StudentResult from "./components/studentResult/StudentResult";
+import { ErrorNotFound } from "./components/common/ErrorPages";
 
+// Composant pour les routes privées, nécessitant une authentification
 const PrivateRoute = ({ children }) => {
   const { auth, loading } = useContext(AuthContext);
 
+  // Affichage d'un spinner pendant le chargement
   if (loading) {
     return <Spin spinning fullscreen></Spin>;
   }
 
+  // Redirection vers la page de login si l'utilisateur n'est pas authentifié
   if (!auth.teacherId) {
-    return <Navigate to="/Login" />;
+    return <Navigate to="/login" />;
   }
 
+  // Affichage des enfants si l'utilisateur est authentifié
   return children;
 };
 
+
+// Définition des routes de l'application
 const router = createBrowserRouter([
   {
     path: "/",
     element: (
       <PrivateRoute>
-        <Layouta />
+        <MainLayout />
       </PrivateRoute>
     ),
     children: [
@@ -39,33 +47,43 @@ const router = createBrowserRouter([
         element: <Home />
       },
       {
-        path: "/Evaluation/:id",
+        path: "/evaluation/:id",
         element: <Evaluation />
       },
       {
-        path: "/Evaluation/:id/Edit",
+        path: "/evaluation/:id/edit",
         element: <EditEvaluation />
       },
       {
-        path: "/Evaluation/:evalId/EvaluateStudent/:studentId",
+        path: "/evaluation/:evalId/EvaluateStudent/:studentId",
         element: <StudentEvaluation />
       },
       {
-        path: "/Result/:evalId/:studentId",
+        path: "/result/:evalId/:studentId",
         element: <StudentEvaluationResult />
       },
       {
-        path: "/Create",
+        path: "/create",
         element: <CreateEvaluation />
       },
     ],
   },
   {
-    path: "/Login",
+    path: "/login",
     element: <Login />
+  },
+  {
+    path: "/studentresult/:evalId/:stuToken",
+    element: <StudentResult /> 
+  },
+  {
+    path: "*",
+    element: <ErrorNotFound />
   },
 ]);
 
+
+// Composant principal de l'application
 export default function App() {
   return (
     <ConfigProvider

@@ -1,17 +1,20 @@
-import { Card } from "antd"
+import { Card,Tooltip } from "antd";
 import { FileAddOutlined } from "@ant-design/icons";
 import EvaluationTable from "./EvaluationsTable";
 import { Link } from "react-router-dom";
-import "./home.css"
+import "./home.css";
+
 function Home() {
 
     return (
         <div className="homeContainer">
             <div className="homeToolbar">
                 <div className="toolbarItemsContainer">
-                    <Link to={"/Create"}>
-                        <Card className="createEvaluationButton" hoverable="true" styles={{ body:{padding:"0.5rem"} }}>
-                            <FileAddOutlined className="icon"/>
+                    <Link to={"/create"}>
+                        <Card className="createEvaluationButton" hoverable styles={{ body:{padding:"0.5rem"} }}>
+                            <Tooltip title="Créer une évaluation">
+                                <FileAddOutlined className="icon"/>
+                            </Tooltip>
                         </Card>
                     </Link>
                 </div>

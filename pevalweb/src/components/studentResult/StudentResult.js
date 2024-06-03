@@ -1,0 +1,243 @@
+import { useState, useEffect } from 'react';
+import { Card, Row, Col, Divider, Collapse } from 'antd';
+import { useParams } from 'react-router-dom';
+import axios from 'axios';
+import {Error} from "../common/ErrorPages";
+
+const { Panel } = Collapse;
+
+// Fonction pour afficher les détails d'un critère
+function renderCriteriaView(criteria, objectiveId, studentId) {
+    
+    // Trouver les résultats du critère pour l'étudiant
+    const result = criteria.criterionResults.find(r => r.csrStudentId === studentId) || {};
+    const criteriaId = criteria.id_criterion;
+    const genericRemark = criteria[`criLevel${result.csrScore}Description`] || 'Remarque generique';
+
+    // Déterminer la classe CSS en fonction du score
+    const getScoreClassName = (score) => {
+        if (score >= 0 && score <= 1) {
+            return 'noteMediocre';
+        } else if (score === 2) {
+            return 'noteAverage';
+        } else if (score === 3) {
+            return 'noteGood';
+        }
+        return '';
+    };
+
+    return (
+        <div key={criteriaId} style={{ borderBottom: '1px solid #ddd', padding: '10px 0'}}>
+            <Row gutter={16} style={{ overflowWrap: 'break-word' }}>
+                <Col span={11}>
+                    <div><strong>Critère</strong></div>
+                    <div>{criteria.criTitle}</div>
+                    <div><strong>Conditions pour démontrer les comportements</strong></div>
+                    <div>{criteria.criConditionsDescription}</div>
+                    <div><strong>Résultats attendus</strong></div>
+                    <div>{criteria.criExpectationDescription}</div>
+                </Col>
+                <Col span={3}>
+                    <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+                        <div style={{ flex: 1, display: 'flex', justifyContent: 'space-between' }}>
+                            <div><strong>Poids</strong></div>
+                            <div>{criteria.criWeight}</div>
+                        </div>
+                        <div style={{ flex: 1 }}>
+                            <div className={`scoreValue ${getScoreClassName(result.csrScore)}`}>{result.csrScore} / 3</div>
+                        </div>
+                    </div>
+                </Col>
+                <Col span={5}>
+                    <div>
+                        {genericRemark}
+                    </div>
+                </Col>
+                <Col span={5}>
+                    <div>
+                        <strong>Remarque personnelle</strong>
+                        <div>{result.csrComment}</div>
+                    </div>
+                </Col>
+            </Row>
+        </div>
+    );
+}
+
+function StudentResult() {
+    const { evalId, stuToken } = useParams();
+    const [objectivesData, setObjectivesData] = useState([]);
+    const [evaluationData, setEvaluationData] = useState({});
+    const [studentData, setStudentData] = useState({});
+    const [studentId, setStudentId] = useState(0);
+    const [note, setNote] = useState(1);
+    const [roundedNote, setRoundedNote] = useState(1);
+
+    useEffect(() => {
+        // Récupérer les données de l'évaluation
+        axios.get(`${process.env.REACT_APP_API_HOST}/evaluations/${evalId}`)
+        .then(res => {
+            const evaluation = res.data;
+            console.log(evaluation["objectives"]);
+            setObjectivesData(evaluation["objectives"] || []);
+            setEvaluationData(evaluation); 
+            calculateNoteFromData(evaluation["objectives"]);
+        }).catch(err => {
+            console.error('Error fetching evaluation data:', err);
+            setObjectivesData([]);
+        });
+    }, 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [studentId]);
+
+    useEffect(() => {
+        // Valider le token de l'étudiant et récupérer les données de l'étudiant
+        axios.post(`${process.env.REACT_APP_API_HOST}/tokens/validateToken`, {
+            token: stuToken
+        })
+        .then(res => {
+            const id = res.data.id;
+            setStudentId(id)
+            axios.get(`${process.env.REACT_APP_API_HOST}/students/${id}`)
+            .then(res => {
+                setStudentData(res.data);
+            })
+        }).catch(err => {
+            console.error('Error fetching student data:', err);
+        });
+    }, [stuToken]);
+
+    // Calculer la note à partir des données de l'évaluation
+    const calculateNoteFromData = (data) => {
+        let totalScore = 0;
+        let totalWeight = 0;
+
+        data.forEach(objective => {
+            const objectiveWeight = parseFloat(objective.objWeight);
+            if (Array.isArray(objective.criterions)) {
+                objective.criterions.forEach(criteria => {
+                    const criteriaWeight = parseFloat(criteria.criWeight);
+                    const result = criteria.criterionResults.find(r => r.csrStudentId === studentId) || {};
+                    const score = result.csrScore || 0;
+                    totalScore += (score / 3) * criteriaWeight * objectiveWeight;
+                    totalWeight += criteriaWeight * objectiveWeight;
+                });
+            }
+        });
+
+        const percentage = totalScore / totalWeight;
+        const calculatedNote = (percentage * 5) + 1;
+        const calculatedRoundedNote = Math.round(calculatedNote * 2) / 2;
+
+        setNote(calculatedNote.toFixed(1));
+        setRoundedNote(calculatedRoundedNote.toFixed(1));
+    };
+
+    // Déterminer la classe CSS en fonction de la note
+    const getNoteClassName = (note) => {
+        if (note >= 1 && note < 4) {
+            return 'noteMediocre';
+        } else if (note >= 4 && note < 5) {
+            return 'noteAverage';
+        } else if (note >= 5 && note <= 6) {
+            return 'noteGood';
+        }
+        return '';
+    };
+
+    if(studentId !== 0 && evaluationData !== []){
+        return (
+            <div style={{minHeight:"100vh" }}>
+                <div style={{minHeight:"100vh" }}>
+                    <Card style={{minHeight:"100vh" }}>
+                        <Row>
+                            <Col span={18} push={6} className='moduleDescriptionsTitleValue'>
+                                {evaluationData.module ? `${evaluationData.module.modNumber} - ${evaluationData.module.modTitle}` : 'Module non défini'}
+                            </Col>
+                            <Col span={6} pull={18} className='moduleDescriptionsTitle'>
+                                Module
+                            </Col>
+                        </Row>
+                        <Row>
+                            <Col span={18} push={6} className='moduleDescriptionsTitleValue'>
+                                {evaluationData["evaTitle"]}
+                            </Col>
+                            <Col span={6} pull={18} className='moduleDescriptionsTitle'>
+                                Titre
+                            </Col>
+                        </Row>
+                        <Row>
+                            <Col span={18} push={6} className='moduleDescriptionsTitleValue'>
+                                {studentData.stuLastname || "Nom"}
+                            </Col>
+                            <Col span={6} pull={18} className='moduleDescriptionsTitle'>
+                                Nom
+                            </Col>
+                        </Row>
+                        <Row>
+                            <Col span={18} push={6} className='moduleDescriptionsTitleValue'>
+                                {studentData.stuFirstname || "Prenom"}
+                            </Col>
+                            <Col span={6} pull={18} className='moduleDescriptionsTitle'>
+                                Prenom
+                            </Col>
+                        </Row>
+                        <Row>
+                            <Col span={18} push={6} className='moduleDescriptionsTitleValue'>
+                                {evaluationData.evaLocation || "Salle"}
+                            </Col>
+                            <Col span={6} pull={18} className='moduleDescriptionsTitle'>
+                                Salle
+                            </Col>
+                        </Row>
+                        <Row>
+                            <Col span={6} className='moduleDescriptionsTitle'>
+                                Note
+                            </Col>
+                            <Col span={10} className={`moduleDescriptionsTitleValue ${getNoteClassName(roundedNote)}`}>
+                                {note} ({roundedNote})
+                            </Col>
+                            <Col span={2} className='moduleDescriptionsTitle'>
+                                Date
+                            </Col>
+                            <Col span={6} className='moduleDescriptionsTitleValue date'>
+                                Mercredi 11.05.2024
+                            </Col>
+                        </Row>
+                        <Divider></Divider>
+                        <Collapse activeKey={Array.isArray(objectivesData) ? objectivesData.map(objective => objective.id_objective.toString()) : []}>
+                            {Array.isArray(objectivesData) && objectivesData.map(obj => (
+                                <Panel 
+                                    header={
+                                        <Row>
+                                            <Col span={20}>
+                                                {obj.objTitle}
+                                            </Col>
+                                            <Col span={3} className='textRight'>
+                                                Poids
+                                            </Col>
+                                            <Col span={1} className='textRight'>
+                                                {obj.objWeight}
+                                            </Col>
+                                        </Row>
+                                    } 
+                                    key={obj.id_objective.toString()}
+                                >
+                                    {Array.isArray(obj.criterions) && obj.criterions.map(criteria => 
+                                        renderCriteriaView(criteria, obj.id_objective, studentId)
+                                    )}
+                                </Panel>
+                            ))}
+                        </Collapse>
+                    </Card>
+                </div>
+            </div>
+        );
+        }else{
+        return (
+            <Error></Error>
+        )
+    }
+}
+
+export default StudentResult;
